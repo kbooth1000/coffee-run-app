@@ -54,7 +54,7 @@ var createOrderDisplay = function(orderNumber) {
         orderDisplayString = localStorage.getItem('order');
     }
 
-    // Remove existing orderRows from display
+    // Remove existing orderRows from display prior to repopulating
     var orL = document.querySelectorAll('.orderRow');
     for (var i=0; i<orL.length;i++) {
         while (orderList.firstChild) {
@@ -68,10 +68,8 @@ var createOrderDisplay = function(orderNumber) {
     var storedOrdersString = storedOrders;
     orderDisplayString = storedOrders;
     storedOrdersString.toString();
-    //storedOrdersString.replace(/[\W_]+/g," ");
     localStorage.setItem('order', storedOrdersString);
 
-    //orderList.removeChild(orL);
 
     // Separately display coffeeorders
     for (var i = 0; i < coffeeOrders.length; i++) {
@@ -85,3 +83,43 @@ var createOrderDisplay = function(orderNumber) {
 
     orderList.classList.add('show');
 }
+
+//$.ajax({url: 'http://dc-coffeerun.herokuapp.com/api/coffeeorders'}, {method: 'GET'});
+var orderObject = {};
+var retrievedOrders = $.ajax({
+    async:     'false',
+    type:     'GET',
+    url:      'http://dc-coffeerun.herokuapp.com/api/coffeeorders',
+    dataType: 'json',
+    success: function(data){
+        console.log(data);
+        
+        for (var key in data) {
+            var datakey = data[key];
+            var orderkey = 0;
+            var orderID, orderCaffeine, orderFlavor, orderSize, orderEmail, orderName;
+            var arrayOfOrderKeys = ['orderID', 'orderCaffeine', 'orderFlavor', 'orderSize', 'orderEmail', 'orderName'];
+            var orderArray = [];
+            for (var orderPart in datakey){
+                orderArray[orderkey] = datakey[orderPart];
+                orderkey ++;
+            }
+            
+            for(var i=0;i<orderArray.length;i++) {
+                
+                var ovalue = orderArray[i], okey = arrayOfOrderKeys[i];
+
+                orderObject[okey] = ovalue;
+                console.log('&& '+orderObject['orderID'], orderObject['orderCaffeine'], orderObject['orderFlavor'], orderObject['orderSize'], orderObject['orderEmail'], orderObject['orderName']);
+                
+            }
+        }
+        
+    }
+    
+});
+
+
+  
+  
+// orderID, orderCaffeine, orderFlavor, orderSize, orderEmail, orderName
