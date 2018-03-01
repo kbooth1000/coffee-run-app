@@ -1,0 +1,16 @@
+.orderList {
+    border: #ccc 1px solid;
+    padding: 4px;
+    width: 80%;
+    list-style: none;
+    background: #ecf;
+    transition: margin-left, .6s;
+    margin-left: -54px;  
+    overflow-wrap: break-word;
+}
+.orderList.show {
+    margin-left: 5px;
+}
+.orderRow {
+    overflow-wrap: break-word;
+}
