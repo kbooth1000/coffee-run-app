@@ -16,10 +16,8 @@ var getOrderSize = function() { // new value after user selects radio button
 }
 
 var orderSizes = orderForm.querySelectorAll('[name="size"]:checked');
-
 var orderFlavor = orderForm.querySelector('[name="flavor"]');
 var orderCaffeine = orderForm.querySelector('[name="strength"]');
-
 var orderNumber = 0;
 
 var compileOrder = function(e) {
