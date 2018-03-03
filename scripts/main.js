@@ -47,6 +47,7 @@ var createOrderDisplay = function(orderNumber) {
     var orderDisplayString = '';
     var orderRows = document.querySelectorAll('.orderRow');
     console.log('orderRows: ' + orderRows);
+
     // Add stored orders to orderDisplayString
     if (orderDisplayString === '') {
         orderDisplayString = localStorage.getItem('order');
@@ -54,18 +55,23 @@ var createOrderDisplay = function(orderNumber) {
 
     clearOrderDisplay(); // Remove existing orderRows from display prior to repopulating
 
-    
-
     storedOrders.push(coffeeOrders[orderNumber]);
     //console.log('Stored orders: ' + storedOrders);
 
-    var storedOrdersString = storedOrders;
-    orderDisplayString = storedOrders;
-    storedOrdersString.toString();
-    localStorage.setItem('order', storedOrdersString);
+    storeOrdersToLocal(storedOrders);
+    console.log('data: '+getRetrievedOrders.returnData);
+    
+    createDisplayRow( getRetrievedOrders.returnData// (function(ordersFromServer){
+    //                     return ordersFromServer;
+    //                 }) 
+    );
+    createDisplayRow(coffeeOrders);
+}
 
-    createDisplayRow();
-    displayCoffeeOrders();
+var storeOrdersToLocal = function(ordersToStore) {
+    orderDisplayString = ordersToStore;
+    orderDisplayString.toString();
+    localStorage.setItem('order', orderDisplayString);
 }
 
 clearOrderDisplay = function() {
@@ -76,65 +82,85 @@ clearOrderDisplay = function() {
     }
 }
 
-var createDisplayRow = function() {
-    for (var i = 0; i < coffeeOrders.length; i++) {
+var createDisplayRow = function(rowTextArray) {
+    for (var i = 0; i < rowTextArray.length; i++) {
         var orderRow = document.createElement('li'); // Create display row
         orderRow.className = 'orderRow';
         orderList.appendChild(orderRow);
-        orderRow.textContent += getRetrievedOrders()[i];
-    }
-}
-
-var displayCoffeeOrders = function() {
-    for (var i = 0; i < coffeeOrders.length; i++) {
-        var orderRow = document.createElement('li'); // Create display row
-        orderRow.className = 'orderRow';
-        orderList.appendChild(orderRow);
-        orderRow.textContent += coffeeOrders[i];
+        orderRow.textContent += '=='+rowTextArray[i]; //getRetrievedOrders()[i];
     }
 }
 
 var orderObject = {};
-var getRetrievedOrders = function() {
+
+
+// getRetrievedOrders(function(ordersFromServer) {
+//     makeRetrievedOrdersList(orderArray, arrayOfOrderKeys);
+// })
+
+
+var dataFromAjax = function(thedata) {
+    console.log('data'+thedata);
+    
+    //return data;
+}
+
+
+var getRetrievedOrders = function(callback) {
+    console.log('$$$');
+    
     var retrievedOrdersList = [];
     var retrievedOrders = $.ajax({
-    async:     'false',
-    type:     'GET',
-    url:      'http://dc-coffeerun.herokuapp.com/api/coffeeorders',
-    dataType: 'json',
-    success: function(data){
-       // console.log(data);
-        
-        for (var key in data) {
-            var datakey = data[key];
-            var orderkey = 0;
-            var orderID, orderCaffeine, orderFlavor, orderSize, orderEmail, orderName;
-            var arrayOfOrderKeys = ['orderID', 'orderCaffeine', 'orderFlavor', 'orderSize', 'orderEmail', 'orderName'];
-            var orderArray = [];
-            for (var orderPart in datakey){
-                orderArray[orderkey] = datakey[orderPart];
-                orderkey ++;
-            }
+        type:     'GET',
+        url:      'http://dc-coffeerun.herokuapp.com/api/coffeeorders',
+        dataType: 'json',
+        success: function(data){
+            console.log('complete: '+data);
             
-            for(var i=0;i<orderArray.length;i++) {
+            var orderArrays=[];
+            for (var key in data) {
+                var datakey = data[key];
+                var orderkey = 0;
+                var orderID, orderCaffeine, orderFlavor, orderSize, orderEmail, orderName;
+                var arrayOfOrderKeys = ['orderID', 'orderCaffeine', 'orderFlavor', 'orderSize', 'orderEmail', 'orderName'];
+                var orderArray = [];
                 
-                var ovalue = orderArray[i], okey = arrayOfOrderKeys[i];
-
-                orderObject[okey] = ovalue;
-                retrievedOrdersList.push(['&& '+orderObject['orderID'], orderObject['orderCaffeine'], orderObject['orderFlavor'], orderObject['orderSize'], orderObject['orderEmail'], orderObject['orderName']]);
-                
+                for (var orderPart in datakey){
+                    orderArray[orderkey] = datakey[orderPart];
+                    orderkey ++;
+                }
+                orderArrays.push(orderArray);
             }
+            console.log('orderArrays: ' + orderArrays);
+            dataFromAjax('testing');
+            var callbackFunction(callback) {
+                callback();
+            }
+
+            // var getReturnData = function() {
+            //     return orderArrays;
+            // }
+            // return {
+            //     returnData: function() { console.log('returndata: '+ getReturnData());
+            //       return getReturnData(); }
+            // }
+
+            //callback(orderArrays);  
+            // function(ordersFromServer){
+            //     return ordersFromServer;
+            // }
         }
-        
-    }
-    
-    
     });
-    return retrievedOrdersList;
+    
+}
+
+var makeRetrievedOrdersList = function(orderArray, arrayOfOrderKeys) {
+    var retrievedOrdersArray = [];
+    for(var i=0;i<orderArray.length;i++) {
+        var ovalue = orderArray[i], okey = arrayOfOrderKeys[i];
+        orderObject[okey] = ovalue;
+        retrievedOrdersArray.push(['&& '+orderObject['orderID'], orderObject['orderCaffeine'], orderObject['orderFlavor'], orderObject['orderSize'], orderObject['orderEmail'], orderObject['orderName']]);
+    }
 }
 
 createOrderDisplay();
-
-  
-  
-// orderID, orderCaffeine, orderFlavor, orderSize, orderEmail, orderName
