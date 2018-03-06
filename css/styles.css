@@ -13,4 +13,8 @@
 }
 .orderRow {
     overflow-wrap: break-word;
+    cursor: pointer;
+}
+.orderRow:hover {
+    background: #f99;
 }
